@@ -14,8 +14,8 @@ const BurgerItem = ({item}: {item: any}) => {
   const [count, setCount] = useState<number>(item?.count);
 
   useEffect(() => {
-    if (item && item?.count) setCount(item?.count);
-  }, [item]);
+    if (item?.count !== count) setCount(item?.count);
+  }, [item?.count, count]);
 
 
   const navToBurgerDetail = () => {
@@ -44,7 +44,7 @@ const BurgerItem = ({item}: {item: any}) => {
           <Text style={styles.description} numberOfLines={1}>
             {item?.item?.desc}
           </Text>
-          {item?.extra && <Text style={styles.extraText}>Extra: {item?.extra?.name}</Text>}
+          {item?.extra && <Text style={styles.extraText}>Extra: {item?.extra?.map((x: any) => x?.name)?.join(', ')}</Text>}
         </View>
         <View style={styles.priceAndCount}>
           <Text style={styles.price}>€{(item?.price * count).toFixed(2)}</Text>

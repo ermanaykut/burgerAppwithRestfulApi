@@ -1,18 +1,22 @@
 import {View, FlatList, Pressable, Text, Image} from 'react-native';
 import React from 'react';
-import {CartStore} from '../../../store';
+import {useNavigation} from '@react-navigation/native';
+
 import {observer} from 'mobx-react';
+
+import {Icon} from 'custom-components/src';
+import DessertItem from './components/DessertItem';
+import BurgerItem from './components/BurgerItem';
+
+import {Celebrate} from '../../../components/Loader/Celebrate';
+
+import {CartStore} from '../../../store';
+import {PAGES} from '../../pages';
+import {EProductType} from '../../../constants/types';
+import {colors} from '../../../constants/colors';
 import globalStyle from '../../../constants/style';
 import styles from './style';
-import {Icon} from 'custom-components/src';
-import {colors} from '../../../constants/colors';
 
-import {EProductType} from '../../../constants/types';
-import DessertItem from './components/DessertItem';
-import {ProductItem} from './components';
-import {useNavigation} from '@react-navigation/native';
-import {PAGES} from '../../pages';
-import {Celebrate} from '../../../components/Loader/Celebrate';
 
 const Cart = () => {
   const clearAll = () => CartStore.clearAll();
@@ -30,7 +34,7 @@ const Cart = () => {
       case EProductType.DESSERT:
         return <DessertItem {...{item}} />;
       case EProductType.BURGER:
-        return <ProductItem {...{item}} />;
+        return <BurgerItem {...{item}} />;
       default:
         return <></>;
     }
@@ -40,9 +44,10 @@ const Cart = () => {
     <View style={[globalStyle.globalContainer, styles.container]}>
       <View style={{height: '93%'}}>
         <>
-          <FlatList data={CartStore.cart} renderItem={renderItem} />
+          <FlatList data={CartStore.cart} renderItem={renderItem}
+ />
         </>
-        {CartStore.cart.length == 0 && (
+        {CartStore.cart.length <= 0 && (
           <View style={styles.emptyCartContainer}>
             <Celebrate />
             <View style={{marginTop:-800}}>
@@ -74,7 +79,7 @@ const Cart = () => {
           </View>
         )}
       </View>
-      {CartStore.cart.length !== 0 && (
+      {CartStore.cart.length > 0 && (
         <View style={styles.bottomContainer}>
           <Pressable onPress={clearAll} style={styles.clearAllButton}>
             <Icon name="trash : feather" size={18} color={colors.white} />

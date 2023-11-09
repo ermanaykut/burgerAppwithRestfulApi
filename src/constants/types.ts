@@ -32,7 +32,7 @@ export interface IAddress{
   flatNumber?: number;
   floorNumber?: number;
   countyName: string;
-  cityyName: string;
+  cityName: string;
   defaultAddress: boolean;
 }
 

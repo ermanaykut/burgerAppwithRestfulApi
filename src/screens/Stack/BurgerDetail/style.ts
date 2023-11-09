@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
 
   },
   actionSheetContainer:{
-    height:370,
+    height:425,
     paddingHorizontal:20,
     paddingVertical:10
 
@@ -140,6 +140,27 @@ const styles = StyleSheet.create({
     color: colors.tortilla,
     fontSize:22,
     marginBottom:15
+  },
+  button: {
+    borderWidth: 1,
+    width:width*0.4,
+    backgroundColor:colors.white,
+    shadowOpacity:0.8,
+    shadowColor:colors.tortilla,
+    borderColor: colors.tortilla + 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 100,
+    marginBottom:30,
+    alignSelf:'center'
+
+  },
+  buttonText: {
+    color: colors.tortilla,
+    fontSize:18,
+    fontWeight:'600',
+
   },
 });
 

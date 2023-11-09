@@ -26,16 +26,7 @@ const DessertDetail = ({route}: any) => {
 
 
   const addToCart = () => {
-    const existingCartItem = CartStore.cart.find(
-      cartItem => cartItem.item.id === item.id && cartItem.item.productType === EProductType.DESSERT 
-    );
-
-
-    if (existingCartItem) {
-      // Update the quantity of the existing item 
-      existingCartItem.count += count;
-      // cartStore.updateCart([...cartStore.cart]);
-    } else {
+    
       // If the item is not in the cart, add it as a new item
       const params = {
         item: {
@@ -49,8 +40,9 @@ const DessertDetail = ({route}: any) => {
         productType,
       };
       CartStore.addToCart(params);
-    }
+    
   };
+  
   
 
   return (
@@ -70,11 +62,11 @@ const DessertDetail = ({route}: any) => {
                 styles.iconContainer,
                 count === 1 && styles.disabledIconContainer,
               ]}>
-              <Icon name="minus : materialcomm" size={22} color={colors.white}/>
+              <Icon name="minus : materialcomm" size={22} color={colors.babypink}/>
             </Pressable>
             <Text style={styles.countText}>{count}</Text>
             <Pressable onPress={increaseCount} style={styles.iconContainer}>
-              <Icon name="plus : materialcomm" size={22} color={colors.white}/>
+              <Icon name="plus : materialcomm" size={22} color={colors.babypink}/>
             </Pressable>
           </View>
           <View style={styles.subPriceContainer}>

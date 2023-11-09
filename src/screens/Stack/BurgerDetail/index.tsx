@@ -17,10 +17,16 @@ const BurgerDetail = ({route}: any) => {
 
   const [count, setCount] = useState<number>(1);
   const [price, setPrice] = useState<number>(item?.price ?? 0);
-  const [extra, setExtra] = useState<IExtra | null>();
+  const [extra, setExtra] = useState<IExtra[]>([]);
 
   useEffect(() => {
-    if (extra) setPrice(item?.price + (extra?.price ?? 0));
+    if (extra) {
+      let extraPrice: any = 0;
+      extra?.map(x => {
+        extraPrice += x?.price;
+      });
+      setPrice(item?.price + extraPrice);
+    }
   }, [extra]);
 
   const productType: EProductType = EProductType.BURGER;
@@ -37,13 +43,24 @@ const BurgerDetail = ({route}: any) => {
   );
 
   const onPress = (item: IExtra) => {
-    actionSheetRef.current?.hide();
-    setExtra(item);
+    if (extra?.find(x => x.id === item?.id)) {
+      let arr = extra.filter(x => x.id !== item?.id);
+      setExtra(arr);
+    } else {
+      setExtra(extra => [...extra, item]);
+    }
   };
 
   const renderExtra = ({item}: {item: IExtra}) => (
-    <ExtraItem {...{item, onPress}} />
+    <ExtraItem
+      {...{
+        item,
+        onPress,
+        isChecked: extra.find(x => x?.id === item.id) ? true : false,
+      }}
+    />
   );
+
   const openExtraAction = () => actionSheetRef.current?.show();
 
   const addToCart = () => {
@@ -55,6 +72,14 @@ const BurgerDetail = ({route}: any) => {
       productType,
     };
     CartStore.addToCart(params);
+  };
+
+  const calculateTotalExtraPrice = (extra: IExtra[] | undefined): number => {
+    if (!extra) {
+      return 0;
+    }
+
+    return extra.reduce((total, item) => total + (item.price || 0), 0);
   };
 
   return (
@@ -97,7 +122,11 @@ const BurgerDetail = ({route}: any) => {
           </View>
           <View style={styles.subPriceContainer}>
             <Text style={styles.totalPrice}>
-              €{(item?.price * count + (extra ? extra?.price : 0)).toFixed(2)}
+              €
+              {(
+                (item?.price +
+                (extra ? calculateTotalExtraPrice(extra) : 0)) * count
+              ).toFixed(2)}
             </Text>
           </View>
           <Pressable onPress={addToCart} style={styles.addToCartContainer}>
@@ -108,7 +137,14 @@ const BurgerDetail = ({route}: any) => {
       <ActionSheet ref={actionSheetRef} gestureEnabled>
         <View style={styles.actionSheetContainer}>
           <Text style={styles.actionTitle}>Choose Your Extra Ingridients</Text>
-          <FlatList data={BURGEREXTRADATA} renderItem={renderExtra} />
+          <>
+            <FlatList data={BURGEREXTRADATA} renderItem={renderExtra} />
+          </>
+          <Pressable
+            onPress={() => actionSheetRef.current?.hide()}
+            style={styles.button}>
+            <Text style={styles.buttonText}>Add</Text>
+          </Pressable>
         </View>
       </ActionSheet>
     </View>

@@ -33,6 +33,25 @@ const styles = StyleSheet.create({
         color: colors.tortilla,
         fontWeight:'600'
     },
+    checkboxContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+      },
+      checkbox: {
+        width: 20,
+        height: 20,
+        borderWidth: 1,
+        borderRadius: 4,
+        borderColor: colors.tortilla,
+        marginRight: 12,
+      },
+      iconContainer: {
+        position: 'absolute',
+        top: -10,
+        width: 30,
+        height: 30,
+        right: -12,
+      },
 
 })
 

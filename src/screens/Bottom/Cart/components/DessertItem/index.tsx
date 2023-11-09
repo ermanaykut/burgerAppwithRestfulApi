@@ -14,8 +14,8 @@ const DessertItem = ({item}: {item: any}) => {
   const [count, setCount] = useState<number>(item?.count);
 
   useEffect(() => {
-    if (item && item?.count) setCount(item?.count);
-  }, [item]);
+    if (item?.count !== count) setCount(item?.count);
+  }, [item?.count, count]);
 
   const navToDessertDetail = () => {
     navigation.navigate(PAGES.DESSERTDETAIL.name, {item: item?.item});

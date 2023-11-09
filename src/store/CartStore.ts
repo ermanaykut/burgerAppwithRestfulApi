@@ -10,47 +10,62 @@ class CartStore {
   @observable total: number = 0;
 
   @action addToCart = (params: any) => {
-    // pizza ve tatlı
-    if(params?.productType === EProductType.BURGER || params?.productType === EProductType.DESSERT){
-
+    console.log('AddToCart Giriş')
+    // Check if the product type is BURGER or DESSERT
+    if (params?.productType === EProductType.BURGER || params?.productType === EProductType.DESSERT) {
       this.total += params?.price * params?.count;
     }
-
-    let product = this.cart.find(
-      x =>
-        x?.item?.id === params?.item?.id && x?.extra?.id === params?.extra?.id,
+  
+    // Find the product in the cart based on item ID
+    let existingProduct = this.cart.find(
+      x => x?.item?.id === params?.item?.id
     );
-
-    if (product) {
-      //ürün ve boyut aynı ise
-      product = {
-        ...product,
-        count: product?.count + params?.count,
-      };
-      // 1 s 1
-      // 1 m 1
-      // 2 s 1
-      let arr: any[] = [];
-
-      this.cart.map(x => {
-        if (x?.item?.id === product?.item?.id) {
-          if (x?.extra?.id !== product?.extra?.id) {
-            arr.push(x);
-          }
-        } else {
-          arr.push(x);
+    console.log(existingProduct)
+  
+    if (existingProduct) {
+      if(existingProduct.productType === EProductType.DESSERT){
+        let dessertPlus = existingProduct={
+          count: existingProduct.count += params?.count
         }
-      });
-      arr?.push(product);
-      this.cart = arr ?? [];
-    } else {
-      //ürün yoksa veya boyut farklıysa
-      let arr: any[] = this.cart;
+        this.cart.push(dessertPlus)
+      } else {
 
-      arr.push(params);
-      this.cart = arr ?? [];
-    }
-  };
+        console.log('existing giriş')
+        // Product with the same item ID exists in the cart
+        
+        // Sort the extras arrays for comparison
+        const existingExtrasSorted = existingProduct.extra.slice().sort();
+        console.log(existingExtrasSorted)
+        
+        const newExtrasSorted = params.extra.slice().sort();
+        console.log(newExtrasSorted)
+        
+        // Check if the sorted extras are the same
+        const extrasMatch =
+        JSON.stringify(existingExtrasSorted) === JSON.stringify(newExtrasSorted);
+        
+        if (extrasMatch) {
+          console.log('extrasMatch girişi')
+          // If the sorted extras are the same, increment the count
+          
+          let bungo = existingProduct={
+            count: existingProduct.count += params?.count
+          }
+          
+          this.cart.push(bungo)
+        } else {
+          console.log('ExtraMatch için else')
+          // If the sorted extras are different, add a new product entry
+          this.cart.push(params);
+        };
+      };
+    } else {
+      console.log('existingProduct else')
+      // Product with the same item ID does not exist in the cart, so add it
+      this.cart.push(params);
+    };
+    };
+    
 
   @action changeCount = (params: any, type: string) => {
     let index = this.cart.findIndex(x => x?.item?.id === params?.item?.id);

@@ -14,70 +14,76 @@ const Profile = () => {
   const userFullName = getLogin('loginData');
   const addressActionRef = useRef<ActionSheetRef>(null);
 
-  const [addressName, setAddressName] = useState<string>('');
-  const [name, setName] = useState<string>('');
-  const [familyName, setFamilyName] = useState<string>('');
-  const [streetName, setStreetName] = useState<string>('');
-  const [buildingNumber, setBuildingNumber] = useState<number>();
-  const [flatNumber, setFlatNumber] = useState<number>();
-  const [floorNumber, setFloorNumber] = useState<number>();
-  const [countyName, setCountyName] = useState<string>('');
-  const [cityyName, setCityName] = useState<string>('');
-  const [defaultAddress, setDefaultAddress] = useState<boolean>(false);
+  //const [addressName, setAddressName] = useState<string>('');
+  //const [name, setName] = useState<string>('');
+  //const [familyName, setFamilyName] = useState<string>('');
+  //const [streetName, setStreetName] = useState<string>('');
+  //const [buildingNumber, setBuildingNumber] = useState<number>();
+  //const [flatNumber, setFlatNumber] = useState<number>();
+  //const [floorNumber, setFloorNumber] = useState<number>();
+  //const [countyName, setCountyName] = useState<string>('');
+  //const [cityName, setCityName] = useState<string>('');
+  //const [defaultAddress, setDefaultAddress] = useState<boolean>(false);
+
+  const [addressInfo, setAddressInfo] = useState<IAddress>({
+    addressName: '',
+    name: '',
+    familyName: '',
+    streetName: '',
+    buildingNumber: undefined,
+    flatNumber: undefined,
+    floorNumber: undefined,
+    countyName: '',
+    cityName: '',
+    defaultAddress: false,
+  });
+
   const [addresses, setAddresses] = useState<IAddress[]>();
-  const [isActionHide, SetIsActionHide] = useState<boolean>(true)
+  const [isActionHide, SetIsActionHide] = useState<boolean>(true);
 
   const latestAddresses = AddressStore.address;
+  const DefCheckAddresses = AddressStore.address.find(
+    x => x?.defaultAddress === true,
+  );
 
   useEffect(() => {
-    async function handleActionSheet(){
-      if(isActionHide){
+    async function handleActionSheet() {
+      if (isActionHide) {
         setAddresses(latestAddresses);
       }
     }
-    handleActionSheet()
+    handleActionSheet();
   }, [addresses]);
 
-  const onDelete=(address:IAddress) =>{
-    AddressStore.deleteAddress(address)
-    const updatedAddreses = addresses?.filter((addressX)=> addressX !== address)
-    setAddresses(updatedAddreses)
-  }
+  const onDelete = (address: IAddress) => {
+    AddressStore.deleteAddress(address);
+    const updatedAddreses = addresses?.filter(addressX => addressX !== address);
+    setAddresses(updatedAddreses);
+  };
 
   const openAddressAction = () => {
-  addressActionRef?.current?.show()
-  SetIsActionHide(false)};
+    addressActionRef?.current?.show();
+    SetIsActionHide(false);
+  };
 
-  const hideActionSheet = () =>{
-    addressActionRef?.current?.hide()
-    SetIsActionHide(true)
-  }
+  const hideActionSheet = () => {
+    addressActionRef?.current?.hide();
+    SetIsActionHide(true);
+  };
 
-  const submitAdress = async () => {
-    const AddressData: IAddress = {
-      addressName,
-      name,
-      familyName,
-      streetName,
-      buildingNumber,
-      flatNumber,
-      floorNumber,
-      countyName,
-      cityyName,
-      defaultAddress,
-    };
+  const submitAddress = async () => {
     try {
-      const isThereName = await AddressStore.control(AddressData.addressName);
+      const isThereName = await AddressStore.control(addressInfo.addressName);
 
       if (isThereName) {
         Alert.alert(
           'Address Name already exists!',
-          'Try unused address name please.',
+          'Try an unused address name, please.',
         );
       } else {
-        AddressStore.addToAdress(AddressData);
-        hideActionSheet()
-        setDefaultAddress(false);
+        AddressStore.addToAdress(addressInfo);
+        hideActionSheet();
+        setAddressInfo(prevInfo => ({...prevInfo, defaultAddress: false}));
       }
     } catch (error) {
       console.error('Error checking address name:', error);
@@ -91,13 +97,16 @@ const Profile = () => {
     return <DefaultAddressItem {...{item, onDelete}} />;
   };
 
-  const chechBoxPress = () => {
-    setDefaultAddress(!defaultAddress);
+  const checkBoxPress = () => {
+    setAddressInfo(prevInfo => ({
+      ...prevInfo,
+      defaultAddress: !prevInfo.defaultAddress,
+    }));
   };
 
   return (
     <View style={[globalStyle.globalContainer, styles.container]}>
-      {addresses?.length === 0 && (
+      {latestAddresses?.length === 0 && (
         <View style={styles.thirdContainer}>
           <View style={styles.userContainer}>
             <Text style={styles.text}>
@@ -112,7 +121,7 @@ const Profile = () => {
           </View>
         </View>
       )}
-      {addresses?.length! > 0 && (
+      {latestAddresses?.length! > 0 && (
         <ScrollView
           style={styles.secondContainer}
           showsVerticalScrollIndicator={false}>
@@ -123,16 +132,17 @@ const Profile = () => {
               and update your information from here.
             </Text>
           </View>
-          <View style={styles.subTitleContainer}>
-            <Text style={styles.subTitle}>Preferred Address</Text>
-          </View>
+          {DefCheckAddresses && (
+            <View style={styles.subTitleContainer}>
+              <Text style={styles.subTitle}>Preferred Address</Text>
+            </View>
+          )}
 
           <View style={styles.flatContainer}>
             <FlatList
               data={addresses}
               renderItem={RenderDefaultAddress}
-              key={addressName}
-              keyExtractor={index => index.toString()}
+              keyExtractor={item => item.addressName.toString()}
             />
           </View>
 
@@ -143,8 +153,7 @@ const Profile = () => {
             <FlatList
               data={addresses}
               renderItem={RenderAddress}
-              key={addressName}
-              keyExtractor={index => index.toString()}
+              keyExtractor={item => item.addressName.toString()}
             />
           </View>
         </ScrollView>
@@ -162,7 +171,9 @@ const Profile = () => {
             <View style={styles.addressContainer}>
               <Input
                 label={'Address Name'}
-                onChangeText={setAddressName}
+                onChangeText={(text: any) =>
+                  setAddressInfo({...addressInfo, addressName: text})
+                }
                 placeholder="Work, home etc.."
                 textColor={colors.tortilla}
                 outlineColor={colors.brown}
@@ -173,7 +184,9 @@ const Profile = () => {
             <View style={styles.nameContainer}>
               <Input
                 label={'Name'}
-                onChangeText={setName}
+                onChangeText={(text: any) =>
+                  setAddressInfo({...addressInfo, name: text})
+                }
                 placeholder="Please Enter Your Name"
                 textColor={colors.tortilla}
                 outlineColor={colors.brown}
@@ -186,7 +199,9 @@ const Profile = () => {
               />
               <Input
                 label={'Family Name'}
-                onChangeText={setFamilyName}
+                onChangeText={(text: any) =>
+                  setAddressInfo({...addressInfo, familyName: text})
+                }
                 placeholder="Please Enter Related Address Name"
                 textColor={colors.tortilla}
                 outlineColor={colors.brown}
@@ -201,7 +216,9 @@ const Profile = () => {
             <View style={styles.streetContainer}>
               <Input
                 label={'Street Name'}
-                onChangeText={setStreetName}
+                onChangeText={(text: any) =>
+                  setAddressInfo({...addressInfo, streetName: text})
+                }
                 placeholder="Please Enter Street Name"
                 textColor={colors.tortilla}
                 outlineColor={colors.brown}
@@ -211,7 +228,9 @@ const Profile = () => {
             <View style={styles.numberContainer}>
               <Input
                 label={'Building No'}
-                onChangeText={setBuildingNumber}
+                onChangeText={(text: any) =>
+                  setAddressInfo({...addressInfo, buildingNumber: text})
+                }
                 placeholder="Building No "
                 textColor={colors.tortilla}
                 outlineColor={colors.brown}
@@ -224,7 +243,9 @@ const Profile = () => {
               />
               <Input
                 label={'Flat No'}
-                onChangeText={setFlatNumber}
+                onChangeText={(text: any) =>
+                  setAddressInfo({...addressInfo, flatNumber: text})
+                }
                 placeholder="Flat No "
                 textColor={colors.tortilla}
                 outlineColor={colors.brown}
@@ -237,7 +258,9 @@ const Profile = () => {
               />
               <Input
                 label={'Floor No'}
-                onChangeText={setFloorNumber}
+                onChangeText={(text: any) =>
+                  setAddressInfo({...addressInfo, floorNumber: text})
+                }
                 placeholder="Floor No "
                 textColor={colors.tortilla}
                 outlineColor={colors.brown}
@@ -252,7 +275,9 @@ const Profile = () => {
             <View style={styles.cityContainer}>
               <Input
                 label={'County Name'}
-                onChangeText={setCountyName}
+                onChangeText={(text: any) =>
+                  setAddressInfo({...addressInfo, countyName: text})
+                }
                 placeholder="Please Enter County Name"
                 textColor={colors.tortilla}
                 outlineColor={colors.brown}
@@ -265,7 +290,9 @@ const Profile = () => {
               />
               <Input
                 label={'City Name'}
-                onChangeText={setCityName}
+                onChangeText={(text: any) =>
+                  setAddressInfo({...addressInfo, cityName: text})
+                }
                 placeholder="Please Enter City Name"
                 textColor={colors.tortilla}
                 outlineColor={colors.brown}
@@ -280,7 +307,7 @@ const Profile = () => {
           </View>
           <View style={styles.buttonContainer}>
             <Button
-              onPress={submitAdress}
+              onPress={submitAddress}
               text="Save"
               textStyle={{color: colors.tortilla}}
               containerStyle={{
@@ -293,8 +320,8 @@ const Profile = () => {
               <Text style={styles.defaultText}>Save As A Default?</Text>
             </View>
             <View style={styles.checkBoxContainer}>
-              <Pressable onPress={chechBoxPress} style={styles.checkBox}>
-                {defaultAddress && (
+              <Pressable onPress={checkBoxPress} style={styles.checkBox}>
+                {addressInfo.defaultAddress && (
                   <Icon
                     name="check : materialcomm"
                     size={60}
