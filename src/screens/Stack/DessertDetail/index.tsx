@@ -6,11 +6,15 @@ import styles from './style';
 import {Icon} from 'custom-components/src';
 import { CartStore } from '../../../store';
 import { colors } from '../../../constants/colors';
+import { useNavigation } from '@react-navigation/native';
 
 const DessertDetail = ({route}: any) => {
   const {item}: {item: IDessert} = route?.params ?? {};
   const [count, setCount] = useState<number>(1);
   const [price, setPrice] = useState<number>(item?.price ?? 0);
+
+  const navigation = useNavigation<any>()
+
 
   const productType: EProductType = EProductType.DESSERT;
 
@@ -40,7 +44,7 @@ const DessertDetail = ({route}: any) => {
         productType,
       };
       CartStore.addToCart(params);
-    
+      navigation.goBack()
   };
   
   

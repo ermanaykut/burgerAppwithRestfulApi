@@ -9,7 +9,7 @@ const BurgerComponent = () => {
   const [burgerList, setBurgerList] = useState<IBurger[]>(DATA)
   useEffect(() => {
     //getBurgers();
-    console.log(burgerList?.[0])
+    
   }, []);
 
   const getBurgers = () => {
@@ -17,7 +17,7 @@ const BurgerComponent = () => {
     .getBurgers()
     .then(res=>{
       setBurgerList(res?.data)
-      console.log(res?.data)
+
     })
     .catch(err=>{
       console.log(err)

@@ -10,6 +10,8 @@ import {BURGEREXTRADATA} from './burgerExtraData';
 import ExtraItem from './components/ExtraItem';
 import {CartStore} from '../../../store';
 import {observer} from 'mobx-react';
+import { useNavigation } from '@react-navigation/native';
+
 
 const BurgerDetail = ({route}: any) => {
   const {item}: {item: IBurger} = route?.params ?? {};
@@ -18,6 +20,8 @@ const BurgerDetail = ({route}: any) => {
   const [count, setCount] = useState<number>(1);
   const [price, setPrice] = useState<number>(item?.price ?? 0);
   const [extra, setExtra] = useState<IExtra[]>([]);
+
+  const navigation = useNavigation<any>()
 
   useEffect(() => {
     if (extra) {
@@ -72,6 +76,7 @@ const BurgerDetail = ({route}: any) => {
       productType,
     };
     CartStore.addToCart(params);
+    navigation.goBack()
   };
 
   const calculateTotalExtraPrice = (extra: IExtra[] | undefined): number => {

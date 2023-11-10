@@ -23,6 +23,8 @@ const Cart = () => {
 
   const navigation = useNavigation<any>();
 
+ 
+
   const burgerToGo = () =>
     navigation.navigate(PAGES.BURGERS.name, {type: true});
 
@@ -47,7 +49,7 @@ const Cart = () => {
           <FlatList data={CartStore.cart} renderItem={renderItem}
  />
         </>
-        {CartStore.cart.length <= 0 && (
+        {CartStore.cartLength <= 0 && (
           <View style={styles.emptyCartContainer}>
             <Celebrate />
             <View style={{marginTop:-800}}>
@@ -79,7 +81,7 @@ const Cart = () => {
           </View>
         )}
       </View>
-      {CartStore.cart.length > 0 && (
+      {CartStore.cartLength > 0 && (
         <View style={styles.bottomContainer}>
           <Pressable onPress={clearAll} style={styles.clearAllButton}>
             <Icon name="trash : feather" size={18} color={colors.white} />
@@ -87,7 +89,7 @@ const Cart = () => {
           </Pressable>
           <View style={styles.totalPriceContainer}>
             <Text style={styles.totalPriceText}>
-              Total: €{CartStore.total.toFixed(2)}
+              Total: €{Math.max(0,CartStore.total).toFixed(2)}
             </Text>
           </View>
         </View>
